@@ -271,12 +271,12 @@ class AutomaçãoDocumentos():
         os.replace(temp_zip_path, diretorio_saida)
         shutil.rmtree(temp_folder, ignore_errors=True)
 
-    def gerar_documentos_pendentes(self,contrato, nome_funcionario, funcao, cpf, admissao, documentos_pendentes, diretorio_modelos, diretorio_saidas):
+    def gerar_documentos_pendentes(self, nome_funcionario, funcao, cpf, admissao, documentos_pendentes, diretorio_modelos, diretorio_saidas):
         for documento in documentos_pendentes:
-            modelo = self.get_modelo(documento, funcao, contrato, diretorio_modelos)
+            modelo = self.get_modelo(documento, funcao, self.contrato_selecionado, diretorio_modelos)
 
             if not modelo:
-                print(f"[AVISO] Documento {documento} não criado para {nome_funcionario} ({funcao}) no contrato {contrato}")
+                print(f"[AVISO] Documento {documento} não criado para {nome_funcionario} ({funcao}) no contrato {self.contrato_selecionado}")
                 continue  
             
             caminho_saida = f"{diretorio_saidas}/{documento}/{documento} - {nome_funcionario}.docx"
@@ -294,20 +294,19 @@ class AutomaçãoDocumentos():
     
     def GerarDocumentos(self):
         data_atual = datetime.now().strftime("%d-%m-%Y")
-        diretorio_tabela = f"RELATÓRIO_DOCUMENTAÇÃO {data_atual}.xlsx"
+        diretorio_tabela = f"RELATÓRIO_DOCUMENTAÇÃO {self.contrato_selecionado} {data_atual}.xlsx"
         tabelas_documentacao = pd.read_excel(diretorio_tabela, sheet_name=None)
         
-        for contrato, tabela_documentacao in tabelas_documentacao.items():
-            diretorio_modelos,  diretorio_saidas = self.get_info_contrato(contrato,"GerarDocumentos")
-            tabela_documentacao = pd.read_excel(diretorio_tabela, sheet_name=contrato, header=1)
+        diretorio_modelos,  diretorio_saidas = self.get_info_contrato("GerarDocumentos")
+        tabela_documentacao = pd.read_excel(diretorio_tabela, sheet_name=self.contrato_selecionado, header=1)
             
-            for _, row in tabela_documentacao.iterrows():
-                nome_funcionario = row["FUNCIONÁRIO"]
-                funcao = row["FUNÇÃO"]
-                cpf = row["CPF"]
-                admissao = row["ADMISSÃO"]
-                documentos_pendentes = [doc for doc in tabela_documentacao.columns[4:] if row[doc] == "P"]
-                
-                if documentos_pendentes:
-                    self.gerar_documentos_pendentes(contrato, nome_funcionario, funcao, cpf, admissao, documentos_pendentes,diretorio_modelos, diretorio_saidas)
+        for _, row in tabela_documentacao.iterrows():
+            nome_funcionario = row["FUNCIONÁRIO"]
+            funcao = row["FUNÇÃO"]
+            cpf = row["CPF"]
+            admissao = row["ADMISSÃO"]
+            documentos_pendentes = [doc for doc in tabela_documentacao.columns[4:] if row[doc] == "P"]
+            
+            if documentos_pendentes:
+                self.gerar_documentos_pendentes(nome_funcionario, funcao, cpf, admissao, documentos_pendentes,diretorio_modelos, diretorio_saidas)
 
