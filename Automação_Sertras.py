@@ -233,7 +233,7 @@ class AutomaçãoSertras():
 
     def criar_excel(self,tabela_sertras):
         data_atual = datetime.now().strftime("%d-%m-%Y")
-        caminho_saida = (f"RELATÓRIO_SERTRAS {data_atual}.xlsx")
+        caminho_saida = (f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx")
 
         tabela_sertras.to_excel(caminho_saida, index=False)
 
@@ -258,7 +258,7 @@ class AutomaçãoSertras():
 
     def GerarRelatório(self):
         data_atual = datetime.now().strftime("%d-%m-%Y")
-        caminho_saida = (f"RELATÓRIO_SERTRAS {data_atual}.xlsx")
+        caminho_saida = (f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx")
 
         self.BaixarRelatório()
 
