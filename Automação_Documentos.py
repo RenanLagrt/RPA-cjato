@@ -23,15 +23,19 @@ class AutomaçãoDocumentos():
         self.contrato_selecionado = contrato_selecionado
     
     def get_info_contrato(self, chamado=None):
-        logo = self.contratos[self.contrato_selecionado]["logo"]
-        diretorio_efetivo = self.contratos[self.contrato_selecionado]["diretorio efetivo"]
-        diretorio_funcionarios = self.contratos[self.contrato_selecionado]["diretorio funcionarios"]["QSMS"]
-        diretorio_modelos = self.contratos[self.contrato_selecionado]["diretorio modelos"]
-        diretorio_saidas = self.contratos[self.contrato_selecionado]["diretorio saida"]
+        path_efetivo = self.contratos[self.contrato_selecionado]["diretorio efetivo"]
+        path_funcionários = self.contratos[self.contrato_selecionado]["diretorio funcionarios"]["QSMS"]
+        path_modelos = self.contratos[self.contrato_selecionado]["diretorio modelos"]
+        path_saídas = self.contratos[self.contrato_selecionado]["diretorio saida"]
         documentos_por_função = self.contratos[self.contrato_selecionado]["documentos/função"]
 
+        diretorio_efetivo = os.path.join(os.path.expanduser("~"), *path_efetivo)
+        diretorio_funcionarios = os.path.join(os.path.expanduser("~"), *path_funcionários)
+        diretorio_modelos = os.path.join(os.path.expanduser("~"), *path_modelos)
+        diretorio_saidas = os.path.join(os.path.expanduser("~"), *path_saídas)
+
         if chamado == 'RelatórioDocumentos':
-            return logo, diretorio_efetivo, diretorio_funcionarios, documentos_por_função
+            return diretorio_efetivo, diretorio_funcionarios, documentos_por_função
         
         if chamado == "GerarDocumentos":
             return diretorio_modelos, diretorio_saidas
@@ -54,7 +58,7 @@ class AutomaçãoDocumentos():
     def obter_documentos_requeridos(funcao, documentos_por_funcao):
         return documentos_por_funcao.get(funcao, documentos_por_funcao["OUTRAS"])
 
-    def personalizar_planilha(self, ws, logo):
+    def personalizar_planilha(self, ws):
         fundo_azul = PatternFill(start_color="003399", end_color="003399", fill_type="solid")
         fonte_branca = Font(size=12, color="FFFFFF", bold=True)
         verde_claro = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")  
@@ -64,6 +68,8 @@ class AutomaçãoDocumentos():
         alinhamento_central = Alignment(horizontal="center", vertical="center", wrap_text=False, shrink_to_fit=True)
 
         ws.insert_rows(1)
+
+        logo = r'img\LOGO CONCREJATO.png'
 
         img = Image(logo)
         img.width = 250
@@ -184,33 +190,34 @@ class AutomaçãoDocumentos():
     def GerarRelatório(self):
         wb = Workbook()
         ordem_documentos = ["ASO", "FRE", "EPI", "NR6", "NR10", "NR11", "NR12", "NR18", "NR33", "NR35", "OS"]
-        
-        for contrato, _ in self.contratos.items():
-            logo, diretorio_efetivo, diretorio_funcionarios, documentos_por_função = self.get_info_contrato(contrato,'RelatórioDocumentos')
 
-            tabela_dados = pd.read_excel(diretorio_efetivo)
-            tabela_dados = self.tratar_tabela(tabela_dados)
+        diretorio_efetivo, diretorio_funcionarios, documentos_por_função = self.get_info_contrato('RelatórioDocumentos')
 
-            dados_planilha = self.gerar_dados_planilha(diretorio_funcionarios, tabela_dados, documentos_por_função, ordem_documentos)
-            colunas = ["FUNCIONÁRIO", "FUNÇÃO", "CPF", "ADMISSÃO"] + ordem_documentos + ["DOCUMENTAÇÃO PENDENTE"]
-            df = pd.DataFrame(dados_planilha, columns=colunas)
+        tabela_dados = pd.read_excel(diretorio_efetivo)
+        tabela_dados = self.tratar_tabela(tabela_dados)
 
-            ws = wb.create_sheet(title=contrato)  
-            for r_idx, row in enumerate([colunas] + df.values.tolist(), 1):
-                for c_idx, value in enumerate(row, 1):
-                    ws.cell(row=r_idx, column=c_idx, value=value)
+        dados_planilha = self.gerar_dados_planilha(diretorio_funcionarios, tabela_dados, documentos_por_função, ordem_documentos)
+        colunas = ["FUNCIONÁRIO", "FUNÇÃO", "CPF", "ADMISSÃO"] + ordem_documentos + ["DOCUMENTAÇÃO PENDENTE"]
+        df = pd.DataFrame(dados_planilha, columns=colunas)
 
-            self.personalizar_planilha(ws,logo)
-        
+        ws = wb.create_sheet(title=self.contrato_selecionado)  
+        for r_idx, row in enumerate([colunas] + df.values.tolist(), 1):
+            for c_idx, value in enumerate(row, 1):
+                ws.cell(row=r_idx, column=c_idx, value=value)
+
+        self.personalizar_planilha(ws)
+    
         if "Sheet" in wb.sheetnames:
             wb.remove(wb["Sheet"])
         
         data_atual = datetime.now().strftime("%d-%m-%Y")
-        caminho_saida =  f"RELATÓRIO_DOCUMENTAÇÃO {data_atual}.xlsx"
+        caminho_saida =  f"RELATÓRIO_DOCUMENTAÇÃO {self.contrato_selecionado} {data_atual}.xlsx"
         wb.save(caminho_saida)
 
-    def ExibirRelatório(self, caminho_saida):
-        self.GerarRelatório()
+        return caminho_saida
+
+    def ExibirRelatório(self):
+        caminho_saida = self.GerarRelatório()
         subprocess.run(["cmd", "/c", "start", "", caminho_saida], shell=True)
 
 
