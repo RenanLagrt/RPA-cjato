@@ -448,7 +448,7 @@ class AutomaçãoSertras():
 
         botao_envio = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="btnFuncaoRequisitoValores"]')))
         self.driver.execute_script("arguments[0].scrollIntoView();", botao_envio)
-        #botao_envio.click()
+        botao_envio.click()
 
         time.sleep(2.5)
 
@@ -464,7 +464,7 @@ class AutomaçãoSertras():
 
         try:
             data_atual = datetime.now().strftime("%d-%m-%Y")
-            tabela_sertras = f"RELATÓRIO_SERTRAS 18-04-2025.xlsx"
+            tabela_sertras = f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx"
             
             tabela_sertras = pd.read_excel(tabela_sertras)
 
@@ -585,7 +585,7 @@ class AutomaçãoSertras():
 
                 for _, linha in grupo.iterrows():
                     status, documento, funcao = linha["STATUS"], linha["DOCUMENTO"], linha["FUNÇÃO"]
-                    caminho_base = dir_dp if documento in doc_dp else dir_qsms
+                    caminho_base = os.path.join(os.path.expanduser('~'), *dir_dp) if documento in doc_dp else os.path.join(os.path.expanduser('~'), *dir_qsms)
                     arquivo = f"{documento} - {nome}"
                     
                     caminho_arquivo = os.path.join(os.path.expanduser("~"), caminho_base, nome, f"{arquivo}.pdf")
