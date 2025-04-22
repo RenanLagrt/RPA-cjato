@@ -1,0 +1,318 @@
+{
+"OB186 - INHAÚMA" : {
+    "botão contrato": "/html/body/div[2]/section/div/div/div[2]/div/div[1]/a/div/div/h5",
+    
+    "documentos" : {
+        "DP": ["RG", "CTPS", "CTF", "FRE", "CNH"],
+        "QSMS": ["ASO", "EPI", "NR10", "NR11", "NR12", "NR33", "NR35", "DIPLOMA"]
+    },
+    "documentos/função" : {
+        "ELETRICISTA DE REPARO DE REDE DE SANEAMENTO" : [
+            "ASO", "FRE", "EPI", "NR6", "NR10", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
+        "OPERADOR DE REPARO DE REDE DE SANEAMENTO" : [
+            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
+        "1/2 OFICIAL DE REPARO DE REDE DE SANEAMENTO CIVIL" : [
+            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
+        "AUXILIAR DE REPARO DE REDE DE SANEAMENTO" : [
+            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
+        "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO" : [
+            "ASO", "FRE", "EPI", "NR6", "NR18", "NR33", "NR35", "OS"
+        ],
+        "OPERADOR RETROESCAVADEIRA" : [
+            "ASO", "FRE", "EPI", "NR6", "NR11", "NR18", "OS"
+        ],
+        "ESTAGIARIO" : [
+            "ASO", "EPI", "NR6", "NR18", "OS"
+        ],
+        "OUTRAS": [
+            "ASO", "FRE", "EPI", "NR6", "NR18", "OS"
+        ]
+    },
+    "diretorio funcionarios" : {
+        "DP": ["CONSORCIO CONCREJATOEFFICO LOTE 1", "Central de Arquivos - SERTRAS ARQUIVO PESSOAL"],
+        "QSMS": ["CONSORCIO CONCREJATOEFFICO LOTE 1", "Central de Arquivos - QSMS", "000 ATUAL - OBRA 186 - INHAÚMA", "Documentação Funcionários"]
+    },
+    "diretorio efetivo": ["CONSORCIO CONCREJATOEFFICO LOTE 1", "Central de Arquivos - QSMS", "000 ATUAL - OBRA 186 - INHAÚMA", "Efetivo", "QUANTITATIVO CONSORCIO.xlsx"],
+
+    "diretorio modelos": ["CONSORCIO CONCREJATOEFFICO LOTE 1", "Central de Arquivos - QSMS","000 ATUAL - OBRA 186 - INHAÚMA","MATRIZ DE DOCUMENTOS", "MODELOS"],
+
+    "diretorio saida": ["CONSORCIO CONCREJATOEFFICO LOTE 1", "Central de Arquivos - QSMS","000 ATUAL - OBRA 186 - INHAÚMA","MATRIZ DE DOCUMENTOS", "DOCUMENTAÇÃO CRIADA"],
+
+    "mapeamentos": {
+        "mapeamento_para_documentos": {
+            "ELETRICISTA DE REPARO DE REDE DE SANEAMENTO": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "DIPLOMA": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "NR10": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_13\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_15\"]"
+            },
+            "OPERADOR DE ESCAVADEIRA": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR11": "//*[@id=\"edtRequisito_Valor_12\"]"
+            },
+            "OUTRAS": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CRF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "DIPLOMA": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "NR10": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR12": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_12\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_14\"]"
+            }
+        },
+        "mapeamento_para_datas": {
+            "ELETRICISTA DE REPARO DE REDE DE SANEAMENTO": {
+                "RG": "//*[@id=\"edtRequisito_Valor_0\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_5\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_7\"]",
+                "NR10": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_12\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_14\"]"
+            },
+            "OPERADOR DE ESCAVADEIRA": {
+                "RG": "//*[@id=\"edtRequisito_Valor_0\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_5\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_7\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "NR11": "//*[@id=\"edtRequisito_Valor_11\"]"
+            },
+            "OUTRAS": {
+                "RG": "//*[@id=\"edtRequisito_Valor_0\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_5\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_7\"]",
+                "NR11": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR12": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_13\"]"
+            }
+        },
+        "mapeamento_para_comentarios": {
+            "OUTRAS": {
+                "RG": "//*[@id=\"edtRequisito_Descricao_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Descricao_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Descricao_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Descricao_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Descricao_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Descricao_8\"]"
+            }
+        }
+    }
+},
+
+"OB201 - SÃO GONÇALO": {
+    "botão contrato": "/html/body/div[2]/section/div/div/div[2]/div/div[2]/a/div/div/h5",
+
+    "documentos" : {
+        "DP": ["RG", "CTPS", "CTF", "FRE", "CNH"],
+        "QSMS": ["ASO", "EPI", "NR10", "NR11", "NR12", "NR33", "NR35", "CERTIFICADO DE CLASSE"]
+    },
+    "documentos/função" : {
+        "ELETRICISTA FORCA E CONTROLE" : [
+            "ASO", "FRE", "EPI", "NR6", "NR10", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
+        "OPERADOR DE REPARO DE REDE DE SANEAMENTO" : [
+            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
+        "1/2 OFICIAL DE REPARO DE REDE DE SANEAMENTO CIVIL" : [
+            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
+        "AUXILIAR DE REPARO DE REDE DE SANEAMENTO" : [
+            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
+        "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO" : [
+            "ASO", "FRE", "EPI", "NR6", "NR18", "NR33", "NR35", "OS"
+        ],
+        "OPERADOR RETROESCAVADEIRA" : [
+            "ASO", "FRE", "EPI", "NR6", "NR11", "NR18", "OS"
+        ],
+        "ESTAGIARIO" : [
+            "ASO", "EPI", "NR6", "NR18", "OS"
+        ],
+        "OUTRAS": [
+            "ASO", "FRE", "EPI", "NR6", "NR18", "OS"
+        ]
+    },
+    "diretorio funcionarios" : {
+        "DP": ["CONSORCIO CONCREJATOEFFICO LOTE 1", "Central de Arquivos - SERTRAS ARQUIVO PESSOAL"],
+        "QSMS": ["CONSORCIO CONCREJATOEFFICO LOTE 1","Central de Arquivos - QSMS","000 ATUAL - OBRA 201 - SÃO GONÇALO","DOCUMENTAÇÃO DE FUNCIONÁRIOS","CONCREJATO"]
+    },
+    "diretorio efetivo": ["CONSORCIO CONCREJATOEFFICO LOTE 1", "Central de Arquivos - QSMS", "000 ATUAL - OBRA 201 - SÃO GONÇALO", "EFETIVO", "QUANTITATIVO CONSORCIO.xlsx"],
+
+    "diretorio modelos": ["CONSORCIO CONCREJATOEFFICO LOTE 1", "Central de Arquivos - QSMS", "000 ATUAL - OBRA 201 - SÃO GONÇALO", "MATRIZ DE DOCUMENTOS", "MODELOS"],
+
+    "diretorio saida": ["CONSORCIO CONCREJATOEFFICO LOTE 1", "Central de Arquivos - QSMS", "000 ATUAL - OBRA 201 - SÃO GONÇALO", "MATRIZ DE DOCUMENTOS", "DOCUMENTAÇÃO CRIADA"],
+
+    "mapeamentos": {
+        "mapeamento_para_documentos": {
+            "ELETRICISTA FORCA E CONTROLE": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "DIPLOMA": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR10": "//*[@id=\"edtRequisito_Valor_13\"]",
+                "NR12": "//*[@id=\"edtRequisito_Valor_15\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_17\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_19\"]"
+            },
+            "SOLDADOR": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "DIPLOMA": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "NR12": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_13\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_15\"]"
+            },
+            "ENCARREGADO DE OBRAS": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "DIPLOMA": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_13\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_15\"]"
+            },
+            "COORDENADOR DE OBRAS": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR12": "//*[@id=\"edtRequisito_Valor_12\"]"
+            },
+            "TECNICO DE SEGURANÇA DO TRABALHO": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "DIPLOMA": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_13\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_15\"]"
+            },
+            "SUPERVISOR SEGURANÇA DO TRABALHO": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "DIPLOMA": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_13\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_15\"]"
+            },
+            "OUTRAS": {
+                "RG": "//*[@id=\"edtRequisito_Valor_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Valor_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Valor_3\"]",
+                "CRF": "//*[@id=\"edtRequisito_Valor_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_8\"]",
+                "DIPLOMA": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "NR10": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR12": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_12\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_14\"]"
+            }
+        },
+        "mapeamento_para_datas": {
+            "ELETRICISTA FORCA E CONTROLE": {
+                "RG": "//*[@id=\"edtRequisito_Valor_0\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_5\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_7\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR10": "//*[@id=\"edtRequisito_Valor_12\"]",
+                "NR12": "//*[@id=\"edtRequisito_Valor_14\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_16\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_18\"]"
+            },
+            "SOLDADOR": {
+                "RG": "//*[@id=\"edtRequisito_Valor_0\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_5\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_7\"]",
+                "NR12": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_12\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_14\"]"
+            },
+            "ENCARREGADO DE OBRAS": {
+                "RG": "//*[@id=\"edtRequisito_Valor_0\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_5\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_7\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_12\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_14\"]"
+            },
+            "TECNICO DE SEGURANÇA DO TRABALHO": {
+                "RG": "//*[@id=\"edtRequisito_Valor_0\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_5\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_7\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_12\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_14\"]"
+            },
+            "SUPERVISOR SEGURANÇA DO TRABALHO": {
+                "RG": "//*[@id=\"edtRequisito_Valor_0\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_5\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_7\"]",
+                "CNH": "//*[@id=\"edtRequisito_Valor_10\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_12\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_14\"]"
+            },
+            "OUTRAS": {
+                "RG": "//*[@id=\"edtRequisito_Valor_0\"]",
+                "ASO": "//*[@id=\"edtRequisito_Valor_5\"]",
+                "EPI": "//*[@id=\"edtRequisito_Valor_7\"]",
+                "NR11": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR12": "//*[@id=\"edtRequisito_Valor_9\"]",
+                "NR33": "//*[@id=\"edtRequisito_Valor_11\"]",
+                "NR35": "//*[@id=\"edtRequisito_Valor_13\"]"
+            }
+        },
+        "mapeamento_para_comentarios": {
+            "OUTRAS": {
+                "RG": "//*[@id=\"edtRequisito_Descricao_1\"]",
+                "CTPS": "//*[@id=\"edtRequisito_Descricao_2\"]",
+                "FRE": "//*[@id=\"edtRequisito_Descricao_3\"]",
+                "CTF": "//*[@id=\"edtRequisito_Descricao_4\"]",
+                "ASO": "//*[@id=\"edtRequisito_Descricao_6\"]",
+                "EPI": "//*[@id=\"edtRequisito_Descricao_8\"]"
+                }
+            }
+        }
+    }
+}
