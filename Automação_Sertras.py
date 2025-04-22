@@ -648,23 +648,3 @@ class AutomaçãoSertras():
 
             return tabela_sertras, documentos_não_encontrados, documentos_encontrados, documentos_enviados, datas_extraidas, vencimentos_projetados, vencimentos_enviados, erro_envio, documentos_atualizados, documentos_nao_atualizados, datas_modificacao  
 
-
-
-
-    
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-        
-

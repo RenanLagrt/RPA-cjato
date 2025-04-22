@@ -9,6 +9,7 @@ import pytesseract
 import xml.etree.ElementTree as ET
 import pandas as pd
 import streamlit as st
+from gerar_cracha import gerar_cracha
 from pdf2image import convert_from_path
 from datetime import datetime
 from dotenv import load_dotenv
@@ -408,6 +409,7 @@ if not st.session_state["executado"]:
         botao_envio_sertras= st.button("Envio Sertras", key="enviar_documentos", help="Clique para executar a automação", use_container_width=True, type="primary")
         botao_relatorio_documentos = st.button("Relatório Documentos", key="gerar_relatório", help="Clique para executar a automação", use_container_width=True, type="primary")
         botao_gerar_documentos = st.button("Gerar Documentos", key="gerar_documentos", help="Clique para executar a automação", use_container_width=True, type="primary")    
+        botao_gerar_cracha = st.button("Gerar Crachá", key="gerar_cracha", help="Clique para executar a automação", use_container_width=True, type="primary")
 
     col1, col_spinner, col3 = st.columns([100,1,100])
 
@@ -457,6 +459,12 @@ if not st.session_state["executado"]:
                 except FileNotFoundError:
                     automaçãodocumentos.GerarRelatório()
                     automaçãodocumentos.GerarDocumentos()
+
+    if botao_gerar_cracha:
+        with col_spinner:
+            st.markdown('<div class="spinner-container">', unsafe_allow_html=True) 
+            with st.spinner(""):         
+                gerar_cracha()
 
 if st.session_state["dados_processados"]:
     dados = st.session_state["dados_processados"]
