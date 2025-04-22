@@ -364,22 +364,15 @@ if "dados_processados" not in st.session_state:
     st.session_state["dados_processados"] = None
 
 # Exibição do cabeçalho
-logo_concrejato = os.path.join(os.path.expanduser("~"), "CONSORCIO CONCREJATOEFFICO LOTE 1", 
-                            "Central de Arquivos - QSMS", "000 ATUAL - OBRA 201 - SÃO GONÇALO", 
-                            "LOGO CONCREJATO.png")
+logo_concrejato = r'img\LOGO CONCREJATO.png'
 
-logo_consorcio = os.path.join(os.path.expanduser("~"), "CONSORCIO CONCREJATOEFFICO LOTE 1", 
-                            "Central de Arquivos - QSMS", "000 ATUAL - OBRA 186 - INHAÚMA", 
-                            "Logo Consórcio.jpg")
+logo_consorcio = r"img\Logo Consórcio.jpg"
 
 col1, col2, col3 = st.columns([1, 4, 1])  
 
 with col1:
     if os.path.exists(logo_concrejato):
         st.image(logo_concrejato, width=220)
-        
-    else:
-        st.warning("Logotipo não encontrado!")
 
 with col2:
     st.markdown(
@@ -390,8 +383,6 @@ with col2:
 with col3:
     if os.path.exists(logo_consorcio):
         st.image(logo_consorcio, width=220)
-    else:
-        st.warning("Logotipo não encontrado!")
 
 # Linha Separadora 
 st.markdown("<hr style='border: 1px solid #004080;'>", unsafe_allow_html=True)
