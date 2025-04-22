@@ -18,17 +18,17 @@ locale.setlocale(locale.LC_TIME, "pt_BR.utf8")
 
 class AutomaçãoDocumentos():
 
-    def __init__(self, contratos):
+    def __init__(self, contratos, contrato_selecionado):
         self.contratos = contratos
-        self.contrato = None
+        self.contrato_selecionado = contrato_selecionado
     
-    def get_info_contrato(self, contrato, chamado=None):
-        logo = self.contratos[contrato]["logo"]
-        diretorio_efetivo = self.contratos[contrato]["diretorio efetivo"]
-        diretorio_funcionarios = self.contratos[contrato]["diretorio funcionarios"]["QSMS"]
-        diretorio_modelos = self.contratos[contrato]["diretorio modelos"]
-        diretorio_saidas = self.contratos[contrato]["diretorio saida"]
-        documentos_por_função = self.contratos[contrato]["documentos/função"]
+    def get_info_contrato(self, chamado=None):
+        logo = self.contratos[self.contrato_selecionado]["logo"]
+        diretorio_efetivo = self.contratos[self.contrato_selecionado]["diretorio efetivo"]
+        diretorio_funcionarios = self.contratos[self.contrato_selecionado]["diretorio funcionarios"]["QSMS"]
+        diretorio_modelos = self.contratos[self.contrato_selecionado]["diretorio modelos"]
+        diretorio_saidas = self.contratos[self.contrato_selecionado]["diretorio saida"]
+        documentos_por_função = self.contratos[self.contrato_selecionado]["documentos/função"]
 
         if chamado == 'RelatórioDocumentos':
             return logo, diretorio_efetivo, diretorio_funcionarios, documentos_por_função

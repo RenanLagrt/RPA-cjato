@@ -33,23 +33,24 @@ pytesseract.pytesseract.tesseract_cmd = tesseract_path
 
 class AutomaçãoSertras():
 
-    def __init__(self, contratos):
+    def __init__(self, contratos, contrato_selecionado):
         load_dotenv()
 
         self.email = os.getenv("EMAIL")
         self.senha = os.getenv("SENHA")
         self.driver = None
         self.contratos = contratos
+        self.contrato_selecionado = contrato_selecionado
 
     def get_info_contrato(self):
-        doc_dp = self.contratos["OB201 - SÃO GONÇALO"]["documentos"]["DP"]
-        doc_qsms = self.contratos["OB201 - SÃO GONÇALO"]["documentos"]["QSMS"]
-        dir_dp = self.contratos["OB201 - SÃO GONÇALO"]["diretorio funcionarios"]["DP"]
-        dir_qsms = self.contratos["OB201 - SÃO GONÇALO"]["diretorio funcionarios"]["QSMS"]
-        mapeamento_para_documentos = self.contratos["OB201 - SÃO GONÇALO"]["mapeamentos"]["mapeamento_para_documentos"]
-        mapeamento_para_datas = self.contratos["OB201 - SÃO GONÇALO"]["mapeamentos"]["mapeamento_para_datas"]
-        mapeamento_para_comentarios = self.contratos["OB201 - SÃO GONÇALO"]["mapeamentos"]["mapeamento_para_comentarios"]
-        xpath_botão_contrato = self.contratos["OB201 - SÃO GONÇALO"]["botão contrato"]
+        doc_dp = self.contratos[self.contrato_selecionado]["documentos"]["DP"]
+        doc_qsms = self.contratos[self.contrato_selecionado]["documentos"]["QSMS"]
+        dir_dp = self.contratos[self.contrato_selecionado]["diretorio funcionarios"]["DP"]
+        dir_qsms = self.contratos[self.contrato_selecionado]["diretorio funcionarios"]["QSMS"]
+        mapeamento_para_documentos = self.contratos[self.contrato_selecionado]["mapeamentos"]["mapeamento_para_documentos"]
+        mapeamento_para_datas = self.contratos[self.contrato_selecionado]["mapeamentos"]["mapeamento_para_datas"]
+        mapeamento_para_comentarios = self.contratos[self.contrato_selecionado]["mapeamentos"]["mapeamento_para_comentarios"]
+        xpath_botão_contrato = self.contratos[self.contrato_selecionado]["botão contrato"]
 
         return doc_dp, doc_qsms, dir_dp, dir_qsms, mapeamento_para_documentos, mapeamento_para_datas, mapeamento_para_comentarios, xpath_botão_contrato
 
@@ -314,7 +315,6 @@ class AutomaçãoSertras():
             # Extrair texto da imagem corrigida
             texto_extraido += pytesseract.image_to_string(pagina)
 
-        # Padrão para encontrar datas nos formatos DD/MM/YYYY ou "DD de mês de YYYY"
         padrao_data = r'(\d{1,2}\/\d{1,2}\/\d{4})|(\d{1,2}\sde\s[a-zà-ú]+\sde\s\d{4})'
         datas_encontradas = re.findall(padrao_data, texto_extraido, re.IGNORECASE)
 

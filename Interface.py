@@ -357,9 +357,6 @@ contratos = {
 
 # ---------------------------|-----------------------------------------|----------------------------|----------------------------|-----------------------------|--------------------
 
-automaçãosertras = AutomaçãoSertras(contratos)
-automaçãodocumentos = AutomaçãoDocumentos(contratos)
-
 if "executado" not in st.session_state:
     st.session_state["executado"] = False  
 
@@ -403,6 +400,12 @@ placeholder_botao = st.empty()
 
 if not st.session_state["executado"]:
     col_empty1, col_button, col_empty2 = st.columns([2, 2, 2])
+
+    with col_button:
+        escolha_contrato = st.selectbox("Selecione uma opção:", list(contratos.keys()))
+
+    automaçãosertras = AutomaçãoSertras(contratos, escolha_contrato)
+    automaçãodocumentos = AutomaçãoDocumentos(contratos, escolha_contrato)
 
     with col_button:
         botao_relatorio_sertras = st.button("Relatório Sertras", key="baixar_relatório", help="Clique para executar a automação", use_container_width=True, type="primary")
