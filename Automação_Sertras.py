@@ -372,6 +372,18 @@ class AutomaçãoSertras():
             data_envio = datetime.strptime(data_envio, "%d/%m/%Y %H:%M")
             limite_correcao = data_envio + timedelta(days=90)
             return data_modificacao > limite_correcao, data_modificacao.strftime("%d/%m/%Y %H:%M")
+        
+    def get_dados(self):
+        data_atual = datetime.now().strftime("%d-%m-%Y")
+        caminho_excel = f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx"
+
+        if not os.path.exists(caminho_excel):
+            tabela_sertras = self.BaixarRelatório() 
+
+        else:
+            tabela_sertras = pd.read_excel(caminho_excel)
+
+        return tabela_sertras
 
     def interacao_interface_recursos(self):
         botão_recursos = WebDriverWait(self.driver,10).until(EC.visibility_of_element_located((By.XPATH,'//*[@id="sidebar-menu"]/div/ul/li[8]/a/span[1]')))
@@ -462,189 +474,102 @@ class AutomaçãoSertras():
     def EnvioSertras(self):
         doc_dp, doc_qsms, dir_dp, dir_qsms, mapeamento_para_documentos, mapeamento_para_datas, mapeamento_para_comentarios, xpath_botão_contrato = self.get_info_contrato()
 
+        tabela_sertras = self.get_dados()
+        tabela_sertras = tabela_sertras.drop(["COMENTÁRIO ANALISTA", "PRAZO SLA"], axis=1)
+
+        Status = ["Pendente", "Pendente Correção", "Vencido"]
+        tabela_sertras = tabela_sertras[tabela_sertras["STATUS"].isin(Status)]
+
         try:
-            data_atual = datetime.now().strftime("%d-%m-%Y")
-            tabela_sertras = f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx"
-            
-            tabela_sertras = pd.read_excel(tabela_sertras)
+            if not hasattr(self, 'driver') or self.driver is None:
+                self.driver = self.initialize_driver()
+            else:
+                self.driver.title 
 
-            tabela_sertras = tabela_sertras.drop(["COMENTÁRIO ANALISTA", "PRAZO SLA"], axis=1)
-
-            Status = ["Pendente", "Pendente Correção", "Vencido"]
-            tabela_sertras = tabela_sertras[tabela_sertras["STATUS"].isin(Status)]
-
+        except Exception as e:
             self.driver = self.initialize_driver()
             self.login_sertras(xpath_botão_contrato)
-            self.interacao_interface_recursos()
 
-            documentos_enviados = []
-            erro_envio = []
-            documentos_não_encontrados = []
-            documentos_encontrados = []
-            documentos_atualizados = []
-            documentos_nao_atualizados = []
-            datas_extraidas = []
-            datas_modificacao = []
-            vencimentos_projetados = []
-            vencimentos_enviados = []
+        self.interacao_interface_recursos()
 
-            NRs = ["NR10", "NR11", "NR12", "NR33", "NR35"]
-            
-            for nome, grupo in tabela_sertras.groupby("NOME"):
-                documentos_validos = []
+        documentos_enviados = []
+        erro_envio = []
+        documentos_não_encontrados = []
+        documentos_encontrados = []
+        documentos_atualizados = []
+        documentos_nao_atualizados = []
+        datas_extraidas = []
+        datas_modificacao = []
+        vencimentos_projetados = []
+        vencimentos_enviados = []
 
-                for _, linha in grupo.iterrows():
-                    status, documento, funcao = linha["STATUS"], linha["DOCUMENTO"], linha["FUNÇÃO"]
-                    caminho_base = os.path.join(os.path.expanduser('~'), *dir_dp) if documento in doc_dp else os.path.join(os.path.expanduser('~'), *dir_qsms)
-                    arquivo = f"{documento} - {nome}"
-                    
-                    caminho_arquivo = os.path.join(os.path.expanduser("~"), caminho_base, nome, f"{arquivo}.pdf")
-
-                    if not os.path.exists(caminho_arquivo):
-                        documentos_não_encontrados.append(arquivo)
-                        continue
-
-                    documentos_encontrados.append(arquivo)
-
-                    if status in ["Pendente Correção","Vencido"]:
-                        atualizado, data_modificacao = self.verificar_atualizacao(status, linha["DATA ANÁLISE"], linha["DATA ENVIO"], caminho_arquivo)
-                        datas_modificacao.append(data_modificacao)
-
-                        if not atualizado:
-                            documentos_nao_atualizados.append(arquivo)
-                            continue
-                        
-                        else:
-                            documentos_atualizados.append(arquivo)
-
-                    else:
-                        datas_modificacao.append("N/A")
-
-                    data_extraida, data_vencimento = self.extrair_vencimento(caminho_arquivo, poppler_path, documento)
-                    
-                    if not data_vencimento:
-                        erro_envio.append(arquivo)
-                        continue
-
-                    if isinstance(data_vencimento, (list, tuple)):
-                        data_vencimento = data_vencimento[0] if data_vencimento else None
-
-                    try:
-                        data_vencimento = datetime.strptime(data_vencimento, "%d/%m/%Y")
-
-                    except (ValueError, TypeError):
-                        erro_envio.append(arquivo)
-                        continue
-
-                    if status == "Pendente Correção":
-                        data_vencimento += timedelta(days=1) 
-
-                    data_vencimento = data_vencimento.strftime('%d/%m/%Y')
-                    datas_extraidas.append(data_extraida)
-                    vencimentos_projetados.append(data_vencimento)
-
-                    documentos_validos.append((arquivo, documento, caminho_arquivo, data_vencimento, funcao))
-
-                if documentos_validos:
-                    self.interacao_interface_envio(nome)
-                
-                    self.enviar_documento(documentos_validos, 
-                                    mapeamento_para_documentos.get(funcao, mapeamento_para_documentos["OUTRAS"]), 
-                                    mapeamento_para_datas.get(funcao, mapeamento_para_datas["OUTRAS"]),
-                                    mapeamento_para_comentarios.get(funcao, mapeamento_para_comentarios["OUTRAS"]), 
-                                    vencimentos_enviados, documentos_enviados)
+        NRs = ["NR10", "NR11", "NR12", "NR33", "NR35"]
         
-            self.driver.quit()
+        for nome, grupo in tabela_sertras.groupby("NOME"):
+            documentos_validos = []
 
-            return tabela_sertras, documentos_não_encontrados, documentos_encontrados, documentos_enviados, datas_extraidas, vencimentos_projetados, vencimentos_enviados, erro_envio, documentos_atualizados, documentos_nao_atualizados, datas_modificacao
-
-        except FileNotFoundError:
-
-            tabela_sertras = self.BaixarRelatório()
-
-            tabela_sertras = self.tratar_tabela(tabela_sertras)
-            tabela_sertras = tabela_sertras.drop(["COMENTÁRIO ANALISTA", "PRAZO SLA"], axis=1)
-
-            Status = ["Pendente", "Pendente Correção", "Vencido"]
-            tabela_sertras = tabela_sertras[tabela_sertras["STATUS"].isin(Status)]
-            self.interacao_interface_recursos()
-
-            documentos_enviados = []
-            erro_envio = []
-            documentos_não_encontrados = []
-            documentos_encontrados = []
-            documentos_atualizados = []
-            documentos_nao_atualizados = []
-            datas_extraidas = []
-            datas_modificacao = []
-            vencimentos_projetados = []
-            vencimentos_enviados = []
-            
-            for nome, grupo in tabela_sertras.groupby("NOME"):
-                documentos_validos = []
-
-                for _, linha in grupo.iterrows():
-                    status, documento, funcao = linha["STATUS"], linha["DOCUMENTO"], linha["FUNÇÃO"]
-                    caminho_base = os.path.join(os.path.expanduser('~'), *dir_dp) if documento in doc_dp else os.path.join(os.path.expanduser('~'), *dir_qsms)
-                    arquivo = f"{documento} - {nome}"
-                    
-                    caminho_arquivo = os.path.join(os.path.expanduser("~"), caminho_base, nome, f"{arquivo}.pdf")
-
-                    if not os.path.exists(caminho_arquivo):
-                        documentos_não_encontrados.append(arquivo)
-                        continue
-
-                    documentos_encontrados.append(arquivo)
-
-                    if status in ["Pendente Correção","Vencido"]:
-                        atualizado, data_modificacao = self.verificar_atualizacao(status, linha["DATA ANÁLISE"], linha["DATA ENVIO"], caminho_arquivo)
-                        datas_modificacao.append(data_modificacao)
-
-                        if not atualizado:
-                            documentos_nao_atualizados.append(arquivo)
-                            continue
-                        
-                        else:
-                            documentos_atualizados.append(arquivo)
-
-                    else:
-                        datas_modificacao.append("N/A")
-
-                    data_extraida, data_vencimento = self.extrair_vencimento(caminho_arquivo, poppler_path, documento)
-                    
-                    if not data_vencimento:
-                        erro_envio.append(arquivo)
-                        continue
-
-                    if isinstance(data_vencimento, (list, tuple)):
-                        data_vencimento = data_vencimento[0] if data_vencimento else None
-
-                    try:
-                        data_vencimento = datetime.strptime(data_vencimento, "%d/%m/%Y")
-
-                    except (ValueError, TypeError):
-                        erro_envio.append(arquivo)
-                        continue
-
-                    if status == "Pendente Correção":
-                        data_vencimento += timedelta(days=1) 
-
-                    data_vencimento = data_vencimento.strftime('%d/%m/%Y')
-                    datas_extraidas.append(data_extraida)
-                    vencimentos_projetados.append(data_vencimento)
-
-                    documentos_validos.append((arquivo, documento, caminho_arquivo, data_vencimento, funcao))
-
-                if documentos_validos:
-                    self.interacao_interface_envio(nome)
+            for _, linha in grupo.iterrows():
+                status, documento, funcao = linha["STATUS"], linha["DOCUMENTO"], linha["FUNÇÃO"]
+                caminho_base = os.path.join(os.path.expanduser('~'), *dir_dp) if documento in doc_dp else os.path.join(os.path.expanduser('~'), *dir_qsms)
+                arquivo = f"{documento} - {nome}"
                 
-                    self.enviar_documento(documentos_validos, 
-                                    mapeamento_para_documentos.get(funcao, mapeamento_para_documentos["OUTRAS"]), 
-                                    mapeamento_para_datas.get(funcao, mapeamento_para_datas["OUTRAS"]), 
-                                    mapeamento_para_comentarios.get(funcao, mapeamento_para_comentarios["OUTRAS"]),
-                                    vencimentos_enviados, documentos_enviados)
-        
-            self.driver.quit()
+                caminho_arquivo = os.path.join(os.path.expanduser("~"), caminho_base, nome, f"{arquivo}.pdf")
 
-            return tabela_sertras, documentos_não_encontrados, documentos_encontrados, documentos_enviados, datas_extraidas, vencimentos_projetados, vencimentos_enviados, erro_envio, documentos_atualizados, documentos_nao_atualizados, datas_modificacao  
+                if not os.path.exists(caminho_arquivo):
+                    documentos_não_encontrados.append(arquivo)
+                    continue
+
+                documentos_encontrados.append(arquivo)
+
+                if status in ["Pendente Correção","Vencido"]:
+                    atualizado, data_modificacao = self.verificar_atualizacao(status, linha["DATA ANÁLISE"], linha["DATA ENVIO"], caminho_arquivo)
+                    datas_modificacao.append(data_modificacao)
+
+                    if not atualizado:
+                        documentos_nao_atualizados.append(arquivo)
+                        continue
+                    
+                    else:
+                        documentos_atualizados.append(arquivo)
+
+                else:
+                    datas_modificacao.append("N/A")
+
+                data_extraida, data_vencimento = self.extrair_vencimento(caminho_arquivo, poppler_path, documento)
+                
+                if not data_vencimento:
+                    erro_envio.append(arquivo)
+                    continue
+
+                if isinstance(data_vencimento, (list, tuple)):
+                    data_vencimento = data_vencimento[0] if data_vencimento else None
+
+                try:
+                    data_vencimento = datetime.strptime(data_vencimento, "%d/%m/%Y")
+
+                except (ValueError, TypeError):
+                    erro_envio.append(arquivo)
+                    continue
+
+                if status == "Pendente Correção":
+                    data_vencimento += timedelta(days=1) 
+
+                data_vencimento = data_vencimento.strftime('%d/%m/%Y')
+                datas_extraidas.append(data_extraida)
+                vencimentos_projetados.append(data_vencimento)
+
+                documentos_validos.append((arquivo, documento, caminho_arquivo, data_vencimento, funcao))
+
+            if documentos_validos:
+                self.interacao_interface_envio(nome)
+            
+                self.enviar_documento(documentos_validos, 
+                                mapeamento_para_documentos.get(funcao, mapeamento_para_documentos["OUTRAS"]), 
+                                mapeamento_para_datas.get(funcao, mapeamento_para_datas["OUTRAS"]),
+                                mapeamento_para_comentarios.get(funcao, mapeamento_para_comentarios["OUTRAS"]), 
+                                vencimentos_enviados, documentos_enviados)
+    
+        self.driver.quit()
+
+        return tabela_sertras, documentos_não_encontrados, documentos_encontrados, documentos_enviados, datas_extraidas, vencimentos_projetados, vencimentos_enviados, erro_envio, documentos_atualizados, documentos_nao_atualizados, datas_modificacao 
 
