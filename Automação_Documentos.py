@@ -145,16 +145,22 @@ class AutomaçãoDocumentos():
 
     @staticmethod
     def tratar_tabela(tabela_dados):
-        tabela_dados["DESC FUNÇÃO"] = tabela_dados["DESC FUNÇÃO"].replace({"1/2 OFICIAL DE REPARO DE REDE DE SANEAMENTO CIVIL" : "MEIO OFICIAL DE REPARO DE REDE DE SANEAMENTO CIVIL",
-                        "ASSISTENTE PLANEJAMENTO II" : "ASSISTENTE PLANEJAMENTO",
-                        "ASSISTENTE PLANEJAMENTO III" : "ASSISTENTE PLANEJAMENTO",
-                        "AUXILIAR ADMINISTRATIVO I" : "AUXILIAR ADMINISTRATIVO",
-                        "AUXILIAR ADMINISTRATIVO III" : "AUXILIAR ADMINISTRATIVO",
-                        "ELETRICISTA DE REPARO DE REDE DE SANEAMENTO I" : "ELETRICISTA DE REPARO DE REDE DE SANEAMENTO",
-                        "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO I" : "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO",
-                        "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO II" : "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO"
-                        })
+        tabela_dados.columns = tabela_dados.columns.str.strip()
         
+        substituicoes = {
+            "1/2 OFICIAL DE REPARO DE REDE DE SANEAMENTO CIVIL" : "MEIO OFICIAL DE REPARO DE REDE DE SANEAMENTO CIVIL",
+            "ASSISTENTE PLANEJAMENTO II" : "ASSISTENTE PLANEJAMENTO",
+            "ASSISTENTE PLANEJAMENTO III" : "ASSISTENTE PLANEJAMENTO",
+            "AUXILIAR ADMINISTRATIVO I" : "AUXILIAR ADMINISTRATIVO",
+            "AUXILIAR ADMINISTRATIVO III" : "AUXILIAR ADMINISTRATIVO",
+            "ELETRICISTA DE REPARO DE REDE DE SANEAMENTO I" : "ELETRICISTA DE REPARO DE REDE DE SANEAMENTO",
+            "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO I" : "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO",
+            "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO II" : "ENCARREGADO DE REPARO DE REDE DE SANEAMENTO"
+        }
+
+        if "DESC FUNÇÃO" in tabela_dados.columns:
+            tabela_dados["DESC FUNÇÃO"] = tabela_dados["DESC FUNÇÃO"].replace(substituicoes)
+
         return tabela_dados
 
     def gerar_dados_planilha(self,diretorio_funcionarios, tabela_dados, documentos_por_função, ordem_documentos):
