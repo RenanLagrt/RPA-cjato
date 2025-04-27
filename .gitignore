@@ -1,0 +1,11 @@
+# Ignorar todos os arquivos .xlsx
+*.xlsx
+
+# Ignorar o arquivo teste.py
+teste.py
+
+# Ignorar todas as pastas __pycache__ em qualquer lugar
+__pycache__/
+
+# Ignorar todos os arquivos .env
+*.env
