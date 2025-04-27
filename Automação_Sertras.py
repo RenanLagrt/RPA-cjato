@@ -292,7 +292,7 @@ class AutomaçãoSertras():
         for pagina_imagem in paginas_imagem:
             texto_extraido += pytesseract.image_to_string(pagina_imagem)
 
-        padrao_data = r'\b\d{2}/\d{2}/\d{2,4}\b'
+        padrao_data = r'\b\d{2}/\d{2}/\d{2}\b'
         datas = re.findall(padrao_data, texto_extraido)
 
         if datas:
@@ -483,9 +483,13 @@ class AutomaçãoSertras():
         try:
             if not hasattr(self, 'driver') or self.driver is None:
                 self.driver = self.initialize_driver()
-            else:
-                self.driver.title 
+                self.login_sertras(xpath_botão_contrato)
 
+            else:
+                titulo = self.driver.title
+                if "Sertras - Sistema de Gestão de Terceiros - Fornecedores" not in titulo: 
+                    raise Exception("Não está na plataforma correta!")
+                
         except Exception as e:
             self.driver = self.initialize_driver()
             self.login_sertras(xpath_botão_contrato)
