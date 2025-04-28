@@ -71,7 +71,7 @@ if not st.session_state["executado"]:
     col_empty1, col_button, col_empty2 = st.columns([2, 2, 2])
 
     with col_button:
-        escolha_contrato = st.selectbox("Selecione um Contrato:", [""] + list(contratos.keys()))
+        escolha_contrato = st.selectbox("Selecione um Contrato:", list(contratos.keys()))
 
     automaçãosertras = AutomaçãoSertras(contratos, escolha_contrato)
     automaçãodocumentos = AutomaçãoDocumentos(contratos, escolha_contrato)
