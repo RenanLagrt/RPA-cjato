@@ -403,7 +403,7 @@ class AutomaçãoSertras():
         
     def get_dados(self):
         data_atual = datetime.now().strftime("%d-%m-%Y")
-        caminho_excel = f"RELATÓRIO_SERTRAS 18-04-2025.xlsx"
+        caminho_excel = f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx"
 
         if not os.path.exists(caminho_excel):
             tabela_sertras = self.BaixarRelatório() 
@@ -491,7 +491,7 @@ class AutomaçãoSertras():
 
         botao_envio = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="btnFuncaoRequisitoValores"]')))
         self.driver.execute_script("arguments[0].scrollIntoView();", botao_envio)
-        #botao_envio.click()
+        botao_envio.click()
 
         time.sleep(2.5)
 
