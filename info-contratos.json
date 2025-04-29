@@ -3,8 +3,8 @@
     "botão contrato": "/html/body/div[2]/section/div/div/div[2]/div/div[1]/a/div/div/h5",
     
     "documentos" : {
-        "DP": ["RG", "CTPS", "CTF", "FRE", "CNH"],
-        "QSMS": ["ASO", "EPI", "NR10", "NR11", "NR12", "NR33", "NR35", "DIPLOMA"]
+        "DP": ["RG", "CTPS", "CTF", "FRE", "CNH", "DIPLOMA"],
+        "QSMS": ["ASO", "EPI", "NR10", "NR11", "NR12", "NR33", "NR35"]
     },
     "documentos/função" : {
         "ELETRICISTA DE REPARO DE REDE DE SANEAMENTO" : [
@@ -123,8 +123,8 @@
     "botão contrato": "/html/body/div[2]/section/div/div/div[2]/div/div[2]/a/div/div/h5",
 
     "documentos" : {
-        "DP": ["RG", "CTPS", "CTF", "FRE", "CNH"],
-        "QSMS": ["ASO", "EPI", "NR10", "NR11", "NR12", "NR33", "NR35", "CERTIFICADO DE CLASSE"]
+        "DP": ["RG", "CTPS", "CTF", "FRE", "CNH", "DIPLOMA"],
+        "QSMS": ["ASO", "EPI", "NR10", "NR11", "NR12", "NR33", "NR35"]
     },
     "documentos/função" : {
         "ELETRICISTA FORCA E CONTROLE" : [
