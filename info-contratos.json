@@ -25,9 +25,6 @@
         "OPERADOR RETROESCAVADEIRA" : [
             "ASO", "FRE", "EPI", "NR6", "NR11", "NR18", "OS"
         ],
-        "COORDENADOR DE OBRAS" : [
-            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
-        ],
         "ESTAGIARIO" : [
             "ASO", "EPI", "NR6", "NR18", "OS"
         ],
@@ -147,6 +144,9 @@
         ],
         "OPERADOR RETROESCAVADEIRA" : [
             "ASO", "FRE", "EPI", "NR6", "NR11", "NR18", "OS"
+        ],
+        "COORDENADOR DE OBRAS" : [
+            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
         ],
         "ESTAGIARIO" : [
             "ASO", "EPI", "NR6", "NR18", "OS"
