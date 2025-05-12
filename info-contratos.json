@@ -151,6 +151,12 @@
         "ESTAGIARIO" : [
             "ASO", "EPI", "NR6", "NR18", "OS"
         ],
+        "TECNICO SEGURANCA DO TRABALHO":[
+            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
+        "SUPERVISOR SEGURANÇA DO TRABALHO":[
+            "ASO", "FRE", "EPI", "NR6", "NR12", "NR18", "NR33", "NR35", "OS"
+        ],
         "OUTRAS": [
             "ASO", "FRE", "EPI", "NR6", "NR18", "OS"
         ]
