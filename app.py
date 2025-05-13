@@ -124,12 +124,7 @@ if not st.session_state["executado"]:
         with col_spinner:
             st.markdown('<div class="spinner-container">', unsafe_allow_html=True) 
             with st.spinner(""):
-                try:
-                    automaçãodocumentos.GerarDocumentos()
-
-                except FileNotFoundError:
-                    automaçãodocumentos.GerarRelatório()
-                    automaçãodocumentos.GerarDocumentos()
+                automaçãodocumentos.GerarDocumentos()
 
     if botao_gerar_cracha:
         with col_spinner:

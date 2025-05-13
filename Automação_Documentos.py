@@ -32,6 +32,24 @@ class AutomaçãoDocumentos():
         self.contratos = contratos
         self.poppler_path = poppler_path
         self.contrato_selecionado = contrato_selecionado
+
+    def get_info_contrato(self, chamado=None):
+        path_efetivo = self.contratos[self.contrato_selecionado]["diretorio efetivo"]
+        path_funcionários = self.contratos[self.contrato_selecionado]["diretorio funcionarios"]["QSMS"]
+        path_modelos = self.contratos[self.contrato_selecionado]["diretorio modelos"]
+        path_saídas = self.contratos[self.contrato_selecionado]["diretorio saida"]
+        documentos_por_função = self.contratos[self.contrato_selecionado]["documentos/função"]
+
+        diretorio_efetivo = os.path.join(os.path.expanduser("~"), *path_efetivo)
+        diretorio_funcionarios = os.path.join(os.path.expanduser("~"), *path_funcionários)
+        diretorio_modelos = os.path.join(os.path.expanduser("~"), *path_modelos)
+        diretorio_saidas = os.path.join(os.path.expanduser("~"), *path_saídas)
+
+        if chamado == 'RelatórioDocumentos':
+            return diretorio_efetivo, diretorio_funcionarios, documentos_por_função
+        
+        if chamado == "GerarDocumentos":
+            return diretorio_efetivo, diretorio_funcionarios, documentos_por_função, diretorio_modelos, diretorio_saidas
     
     def ler_aso(self,caminho_arquivo, poppler_path):
         paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path)
@@ -144,24 +162,6 @@ class AutomaçãoDocumentos():
         
         else:
             return self.ler_aso(caminho_arquivo, poppler_path)
-    
-    def get_info_contrato(self, chamado=None):
-        path_efetivo = self.contratos[self.contrato_selecionado]["diretorio efetivo"]
-        path_funcionários = self.contratos[self.contrato_selecionado]["diretorio funcionarios"]["QSMS"]
-        path_modelos = self.contratos[self.contrato_selecionado]["diretorio modelos"]
-        path_saídas = self.contratos[self.contrato_selecionado]["diretorio saida"]
-        documentos_por_função = self.contratos[self.contrato_selecionado]["documentos/função"]
-
-        diretorio_efetivo = os.path.join(os.path.expanduser("~"), *path_efetivo)
-        diretorio_funcionarios = os.path.join(os.path.expanduser("~"), *path_funcionários)
-        diretorio_modelos = os.path.join(os.path.expanduser("~"), *path_modelos)
-        diretorio_saidas = os.path.join(os.path.expanduser("~"), *path_saídas)
-
-        if chamado == 'RelatórioDocumentos':
-            return diretorio_efetivo, diretorio_funcionarios, documentos_por_função
-        
-        if chamado == "GerarDocumentos":
-            return diretorio_modelos, diretorio_saidas
     
     @staticmethod
     def get_diretorio_funcionario(diretorio_funcionarios, nome):
@@ -451,21 +451,55 @@ class AutomaçãoDocumentos():
             }
             
             self.substituir_texto_docx(modelo, substituicoes, caminho_saida)
+
+    def gerar_dados(self,diretorio_funcionarios, tabela_dados, documentos_por_função, ordem_documentos):
+        dados_planilha = []
+        cabeçalho = ["FUNCIONÁRIO", "FUNÇÃO", "CPF", "ADMISSÃO", "FRE", "ASO", "EPI", "NR6", "NR10", "NR11", "NR12", "NR18", "NR33", "NR35", "OS", "DOCUMENTOS PENDENTES"]
+        
+        for nome, linha in tabela_dados.groupby("NOME"):
+            caminho_funcionario = self.get_diretorio_funcionario(diretorio_funcionarios, nome)
+            funcao = str(linha["DESC FUNÇÃO"].iloc[0])
+            admissao = self.formatar_data(linha["DATA ADMISSAO"].iloc[0])
+            cpf = self.formatar_cpf(linha["CPF"].iloc[0])
+
+            documentos_requeridos = self.obter_documentos_requeridos(funcao, documentos_por_função)
+            documentos_na_pasta = os.listdir(caminho_funcionario) if os.path.isdir(caminho_funcionario) else []
+            
+            linha_dados = [nome, funcao, cpf, admissao]
+            documentos_pendentes = []
+
+            for documento in ordem_documentos:
+                if documento in documentos_requeridos:
+                    nome_esperado = f"{documento} - {nome}.pdf"
+                    linha_dados.append("OK" if nome_esperado in documentos_na_pasta else "P")
+
+                    if nome_esperado not in documentos_na_pasta:
+                        documentos_pendentes.append(documento)
+                else:
+                    linha_dados.append("N/A")
+            
+            linha_dados.append(" - ".join(documentos_pendentes) if documentos_pendentes else "---")
+            dados_planilha.append(linha_dados)
+
+        return pd.DataFrame(dados_planilha, columns=cabeçalho)
     
     def GerarDocumentos(self):
         data_atual = datetime.now().strftime("%d-%m-%Y")
-        diretorio_tabela = f"RELATÓRIO_DOCUMENTAÇÃO {self.contrato_selecionado} {data_atual}.xlsx"
-        tabelas_documentacao = pd.read_excel(diretorio_tabela, sheet_name=None)
-        
-        diretorio_modelos,  diretorio_saidas = self.get_info_contrato("GerarDocumentos")
-        tabela_documentacao = pd.read_excel(diretorio_tabela, sheet_name=self.contrato_selecionado, header=1)
+        diretorio_efetivo, diretorio_funcionarios, documentos_por_função, diretorio_modelos, diretorio_saidas = self.get_info_contrato('GerarDocumentos')
+
+        ordem_documentos = ["FRE", "ASO", "EPI", "NR6", "NR10", "NR11", "NR12", "NR18", "NR33", "NR35", "OS"]
+
+        tabela_dados = pd.read_excel(diretorio_efetivo)
+        tabela_dados = self.tratar_tabela(tabela_dados)
+
+        tabela = self.gerar_dados(diretorio_funcionarios, tabela_dados, documentos_por_função, ordem_documentos)
             
-        for _, row in tabela_documentacao.iterrows():
+        for _, row in tabela.iterrows():
             nome_funcionario = row["FUNCIONÁRIO"]
             funcao = row["FUNÇÃO"]
             cpf = row["CPF"]
             admissao = row["ADMISSÃO"]
-            documentos_pendentes = [doc for doc in tabela_documentacao.columns[4:] if row[doc] == "P"]
+            documentos_pendentes = [doc for doc in tabela.columns[4:] if row[doc] == "P"]
             
             if documentos_pendentes:
                 self.gerar_documentos_pendentes(nome_funcionario, funcao, cpf, admissao, documentos_pendentes,diretorio_modelos, diretorio_saidas)
