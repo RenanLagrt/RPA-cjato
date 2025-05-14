@@ -81,7 +81,12 @@ class AutomaçãoSertras():
         except:
             pass
 
-    def download_xml(self):
+    def download_arquivo(self, tipo="pessoas"):
+        mapeamento = {
+            "pessoas": '//*[@id="sidebar-menu"]/div/ul/li[9]/ul/li[2]/ul/li[1]/a',
+            "empresas": '//*[@id="sidebar-menu"]/div/ul/li[9]/ul/li[2]/ul/li[4]/a/span'
+        }
+
         botão_relatório = WebDriverWait(self.driver,10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="sidebar-menu"]/div/ul/li[9]/a/span[1]')))
         self.driver.execute_script("arguments[0].scrollIntoView();", botão_relatório)
         botão_relatório.click()
@@ -90,9 +95,9 @@ class AutomaçãoSertras():
         self.driver.execute_script("arguments[0].scrollIntoView();", botão_integração)
         botão_integração.click()
 
-        botão_integração_pessoas = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="sidebar-menu"]/div/ul/li[9]/ul/li[2]/ul/li[1]/a')))
-        self.driver.execute_script("arguments[0].scrollIntoView();", botão_integração_pessoas)
-        botão_integração_pessoas.click()
+        botão_final = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, mapeamento[tipo])))
+        self.driver.execute_script("arguments[0].scrollIntoView();", botão_final)
+        botão_final.click()
 
         marcar_todos = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="dashboard-v1"]/div[3]/div/div/div[2]/form/div[1]/div[1]/div/label/a[1]')))
         marcar_todos.click()
@@ -194,7 +199,6 @@ class AutomaçãoSertras():
 
     def personalizar_excel(self, caminho_saida):
         wb = load_workbook(caminho_saida)
-        ws = wb.active
 
         alinhamento_central = Alignment(horizontal="center", vertical="center", wrap_text=True)
         fundo_preto = PatternFill(start_color="000000", end_color="000000", fill_type="solid")
@@ -207,36 +211,38 @@ class AutomaçãoSertras():
             bottom=Side(style="thin")
         )
 
-        ws.row_dimensions[1].height = 30
+        for ws in wb.worksheets:  
+            ws.row_dimensions[1].height = 30
 
-        for cell in ws[1]:  
-            if isinstance(cell, MergedCell):  
-                continue
-            cell.fill = fundo_preto
-            cell.font = fonte_branca
-            cell.alignment = alinhamento_central
-            cell.border = borda
-
-        for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
-            ws.row_dimensions[row[0].row].height = 23
-            for cell in row:
+            for cell in ws[1]:  
                 if isinstance(cell, MergedCell):  
                     continue
-                cell.border = borda 
+                cell.fill = fundo_preto
+                cell.font = fonte_branca
                 cell.alignment = alinhamento_central
+                cell.border = borda
 
-        self.ajustar_largura_colunas(ws)
+            for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+                ws.row_dimensions[row[0].row].height = 23
+                for cell in row:
+                    if isinstance(cell, MergedCell):  
+                        continue
+                    cell.border = borda 
+                    cell.alignment = alinhamento_central
 
-        ws.freeze_panes = "B1"
-        ws.auto_filter.ref = "A1:N{}".format(ws.max_row)
+            self.ajustar_largura_colunas(ws)
+            ws.freeze_panes = "B2"
+            ws.auto_filter.ref = f"A1:{ws.cell(row=1, column=ws.max_column).coordinate}"
 
         wb.save(caminho_saida)
 
-    def criar_excel(self,tabela_sertras):
+    def criar_excel(self,tabela_pessoas, tabela_empresa):   
         data_atual = datetime.now().strftime("%d-%m-%Y")
-        caminho_saida = (f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx")
+        caminho_saida = f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx"
 
-        tabela_sertras.to_excel(caminho_saida, index=False)
+        with pd.ExcelWriter(caminho_saida, engine='openpyxl') as writer:
+            tabela_pessoas.to_excel(writer, sheet_name='PESSOAS', index=False)
+            tabela_empresa.to_excel(writer, sheet_name='EMPRESA', index=False)
 
         self.personalizar_excel(caminho_saida)
 
@@ -244,18 +250,21 @@ class AutomaçãoSertras():
         self.driver = self.initialize_driver()
         doc_dp, doc_qsms, dir_dp, dir_qsms, mapeamento_para_documentos, mapeamento_para_datas, mapeamento_para_comentarios, xpath_botão_contrato = self.get_info_contrato()
         self.login_sertras(xpath_botão_contrato)
-        self.download_xml()
 
         diretorio_downloads = os.path.expanduser("~/Downloads")
-        caminho_arquivo = self.wait_for_download(diretorio_downloads)
 
-        tabela_sertras = self.ler_xml(caminho_arquivo)
+        # Baixar RELATÓRIO DE EMPRESAS
+        self.download_arquivo(tipo="empresas")
+        caminho_empresa = self.wait_for_download(diretorio_downloads)
+        tabela_empresa = self.ler_xml(caminho_empresa)
 
-        tabela_sertras = self.tratar_tabela(tabela_sertras)
+        # Baixar RELATÓRIO DE PESSOAS
+        self.download_arquivo(tipo="pessoas")
+        caminho_pessoas = self.wait_for_download(diretorio_downloads)
+        tabela_pessoas = self.ler_xml(caminho_pessoas)
+        tabela_pessoas = self.tratar_tabela(tabela_pessoas)
 
-        self.criar_excel(tabela_sertras)
-
-        return tabela_sertras
+        self.criar_excel(tabela_pessoas, tabela_empresa)   
 
     def GerarRelatório(self):
         data_atual = datetime.now().strftime("%d-%m-%Y")
@@ -406,7 +415,8 @@ class AutomaçãoSertras():
         caminho_excel = f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx"
 
         if not os.path.exists(caminho_excel):
-            tabela_sertras = self.BaixarRelatório() 
+            self.BaixarRelatório() 
+            tabela_sertras = pd.read_excel(caminho_excel, sheet_name="PESSOAS")
 
         else:
             tabela_sertras = pd.read_excel(caminho_excel)
