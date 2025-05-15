@@ -95,14 +95,14 @@ class AutomaçãoSertras():
         self.driver.execute_script("arguments[0].scrollIntoView();", botão_integração)
         botão_integração.click()
 
-        botão_final = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, mapeamento[tipo])))
+        botão_final = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, mapeamento[tipo])))
         self.driver.execute_script("arguments[0].scrollIntoView();", botão_final)
         botão_final.click()
 
         marcar_todos = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="dashboard-v1"]/div[3]/div/div/div[2]/form/div[1]/div[1]/div/label/a[1]')))
         marcar_todos.click()
 
-        botão_dowload = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="box-filter"]/button[3]')))
+        botão_dowload = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="box-filter"]/button[3]')))
         botão_dowload.click()
 
     @staticmethod
