@@ -257,6 +257,9 @@ class AutomaçãoSertras():
         self.download_arquivo(tipo="empresas")
         caminho_empresa = self.wait_for_download(diretorio_downloads)
         tabela_empresa = self.ler_xml(caminho_empresa)
+        tabela_empresa = self.tratar_tabela(tabela_empresa)
+
+        time.sleep(1)
 
         # Baixar RELATÓRIO DE PESSOAS
         self.download_arquivo(tipo="pessoas")
