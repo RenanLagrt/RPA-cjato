@@ -9,6 +9,7 @@ import pytesseract
 import xml.etree.ElementTree as ET
 import pandas as pd
 import streamlit as st
+from openpyxl.utils import get_column_letter
 from PIL import ImageOps, ImageEnhance
 from pdf2image import convert_from_path
 from datetime import datetime
@@ -192,10 +193,24 @@ class AutomaçãoSertras():
 
     @staticmethod
     def ajustar_largura_colunas(ws):
-        for col_cells in ws.columns:
-            col_letter = col_cells[0].column_letter 
-            max_length = max((len(str(cell.value)) for cell in col_cells if cell.value), default=0)
-            ws.column_dimensions[col_letter].width = max_length + 2
+        for i, col_cells in enumerate(ws.columns, 1):
+            col_letter = get_column_letter(i)
+            max_length = 0
+            for cell in col_cells:
+                if cell.value:
+                    try:
+                        cell_value = str(cell.value).replace("\n", "").strip()
+                        max_length = max(max_length, len(cell_value))
+                    except:
+                        pass
+
+            adjusted_width = max_length + 2
+            # Se for a coluna DOCUMENTO, aplicar largura mínima de 15
+            header = str(col_cells[0].value).strip().upper() if col_cells[0].value else ""
+            if header == "DOCUMENTO":
+                ws.column_dimensions[col_letter].width = max(adjusted_width, 15)
+            else:
+                ws.column_dimensions[col_letter].width = adjusted_width
 
     def personalizar_excel(self, caminho_saida):
         wb = load_workbook(caminho_saida)
