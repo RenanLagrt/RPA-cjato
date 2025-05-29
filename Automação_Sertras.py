@@ -475,17 +475,21 @@ class AutomaçãoSertras():
         self.driver.switch_to.window(abas[-1])
 
     def enviar_documento(self, documentos_validos, mapeamento_para_documentos, mapeamento_para_datas, mapeamento_para_comentarios,vencimentos_enviados, documentos_enviados):
-        for arquivo, documento, caminho_arquivo, data_vencimento, função in documentos_validos:
+        for status, arquivo, documento, caminho_arquivo, data_vencimento, função in documentos_validos:
             if documento in mapeamento_para_datas:
                 xpath_data = mapeamento_para_datas[documento]
                 campo_data = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_data)))
                 self.driver.execute_script("arguments[0].scrollIntoView();", campo_data)
+
+                if status == "Pendente Correção":
+                    data_vencimento = campo_data.get_attribute("value")
+                    data_vencimento = datetime.strptime(data_vencimento, "%d/%m/%Y")
+                    data_vencimento += timedelta(days=1)
+                    data_vencimento = data_vencimento.strftime('%d/%m/%Y')
+
                 campo_data.clear()
                 campo_data.send_keys(data_vencimento)
                 vencimentos_enviados.append(data_vencimento)
-
-            if data_vencimento is None:
-                vencimentos_enviados.append("N/A")
 
             if documento in mapeamento_para_documentos:
                 xpath_documento = mapeamento_para_documentos[documento]
@@ -499,6 +503,9 @@ class AutomaçãoSertras():
                 campo_comentario = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_comentario)))
                 self.driver.execute_script("arguments[0].scrollIntoView();", campo_comentario)
                 campo_comentario.clear()
+
+            if data_vencimento is None:
+                vencimentos_enviados.append("N/A")
 
             time.sleep(1)
 
@@ -582,36 +589,42 @@ class AutomaçãoSertras():
                     datas_modificacao.append("N/A")
 
                 if documento in ["ASO","EPI", "NR10", "NR11", "NR12", "NR33", "NR35"]:
-                    data_extraida, data_vencimento = self.extrair_vencimento(caminho_arquivo, poppler_path, documento)
+                    if status in ["Pendente", "Vencido"]:
+                        data_extraida, data_vencimento = self.extrair_vencimento(caminho_arquivo, poppler_path, documento)
 
-                    if isinstance(data_vencimento, (list, tuple)):
-                        data_vencimento = data_vencimento[0] if data_vencimento else None
+                        if isinstance(data_vencimento, (list, tuple)):
+                            data_vencimento = data_vencimento[0] if data_vencimento else None
 
-                    if not data_vencimento:
-                        erro_envio.append(arquivo)
-                        continue
+                        if not data_vencimento:
+                            erro_envio.append(arquivo)
+                            continue
 
-                    try:
-                        data_vencimento = datetime.strptime(data_vencimento, "%d/%m/%Y")
+                        try:
+                            data_vencimento = datetime.strptime(data_vencimento, "%d/%m/%Y")
 
-                        if status == "Pendente Correção":
-                            data_vencimento += timedelta(days=1)
-                        
-                        data_vencimento = data_vencimento.strftime('%d/%m/%Y')
+                            if status == "Pendente Correção":
+                                data_vencimento += timedelta(days=1)
+                            
+                            data_vencimento = data_vencimento.strftime('%d/%m/%Y')
 
-                    except (ValueError, TypeError):
-                        erro_envio.append(arquivo)
-                        continue
+                        except (ValueError, TypeError):
+                            erro_envio.append(arquivo)
+                            continue
 
-                    datas_extraidas.append(data_extraida)
-                    vencimentos_projetados.append(data_vencimento)
+                        datas_extraidas.append(data_extraida)
+                        vencimentos_projetados.append(data_vencimento)
+
+                    else:
+                        data_vencimento = None
+                        datas_extraidas.append("N/A")
+                        vencimentos_projetados.append("N/A")
 
                 else:
                     data_vencimento = None
                     datas_extraidas.append("N/A")
                     vencimentos_projetados.append("N/A")
 
-                documentos_validos.append((arquivo, documento, caminho_arquivo, data_vencimento, funcao))
+                documentos_validos.append((status, arquivo, documento, caminho_arquivo, data_vencimento, funcao))
 
             if documentos_validos:
                 self.interacao_interface_envio(nome)
