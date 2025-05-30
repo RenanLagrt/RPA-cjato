@@ -81,7 +81,6 @@ if not st.session_state["executado"]:
         botao_envio_sertras= st.button("Envio Sertras", key="enviar_documentos", help="Clique para executar a automação", use_container_width=True, type="primary")
         botao_relatorio_documentos = st.button("Relatório Documentos", key="gerar_relatório", help="Clique para executar a automação", use_container_width=True, type="primary")
         botao_gerar_documentos = st.button("Gerar Documentos", key="gerar_documentos", help="Clique para executar a automação", use_container_width=True, type="primary")    
-        botao_gerar_cracha = st.button("Gerar Crachá", key="gerar_cracha", help="Clique para executar a automação", use_container_width=True, type="primary")
 
     col1, col_spinner, col3 = st.columns([100,1,100])
 
@@ -126,12 +125,6 @@ if not st.session_state["executado"]:
             with st.spinner(""):
                 automaçãodocumentos.GerarDocumentos()
 
-    if botao_gerar_cracha:
-        with col_spinner:
-            st.markdown('<div class="spinner-container">', unsafe_allow_html=True) 
-            with st.spinner(""):         
-                gerar_cracha()
-
 if st.session_state["dados_processados"]:
     dados = st.session_state["dados_processados"]
     
@@ -145,7 +138,7 @@ if st.session_state["dados_processados"]:
     df_relatorio = pd.DataFrame(list(zip_longest(dados["erro_envio"], dados["datas_extraidas"], dados["vencimentos_projetados"], 
                                        dados["documentos_enviados"], dados["vencimentos_enviados"], fillvalue="---")),
 
-                                columns=["DOCUMENTOS SEM DATA EXTRAÍDA","DATAS EXTRAÍDAS", "VENCIMENTOS PROJETADOS", "DOCUMENTOS ENVIADOS", "VENCIMENTOS ENVIADOS"])
+                                columns=["DOCUMENTOS SEM DATA EXTRAÍVEL","DATAS EXTRAÍDAS", "VENCIMENTOS PROJETADOS", "DOCUMENTOS ENVIADOS", "VENCIMENTOS ENVIADOS"])
     
     @st.cache_data
     def to_excel_cached(df, sheet_name):

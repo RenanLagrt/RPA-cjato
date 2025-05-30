@@ -9,6 +9,7 @@ import pytesseract
 import xml.etree.ElementTree as ET
 import pandas as pd
 import streamlit as st
+from PyPDF2 import PdfReader
 from openpyxl.utils import get_column_letter
 from PIL import ImageOps, ImageEnhance
 from pdf2image import convert_from_path
@@ -205,10 +206,10 @@ class AutomaçãoSertras():
                         pass
 
             adjusted_width = max_length + 2
-            # Se for a coluna DOCUMENTO, aplicar largura mínima de 15
             header = str(col_cells[0].value).strip().upper() if col_cells[0].value else ""
             if header == "DOCUMENTO":
                 ws.column_dimensions[col_letter].width = max(adjusted_width, 15)
+
             else:
                 ws.column_dimensions[col_letter].width = adjusted_width
 
@@ -300,11 +301,12 @@ class AutomaçãoSertras():
         return (data_obj.replace(year=data_obj.year + anos)).strftime("%d/%m/%Y")
 
     def ler_aso(self,caminho_arquivo, poppler_path):
-        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path)
+        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path, first_page=1, last_page=1)
         texto_extraido = ""
 
-        for pagina_imagem in paginas_imagem:
-            texto_extraido += pytesseract.image_to_string(pagina_imagem)
+        pagina_imagem = paginas_imagem[0]
+
+        texto_extraido = pytesseract.image_to_string(pagina_imagem)
 
         padrao_data = r'\b\d{2}/\d{2}/\d{4}\b'
         datas = re.findall(padrao_data, texto_extraido)
@@ -314,19 +316,14 @@ class AutomaçãoSertras():
         return None, None  
 
     def ler_epi(self,caminho_arquivo, poppler_path):
-        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path)
+        reader = PdfReader(caminho_arquivo)
+        last_page = len(reader.pages)
+
+        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path, first_page=last_page, last_page=last_page)
         texto_extraido = ""
 
-        for pagina_imagem in paginas_imagem: 
-            pagina = pagina_imagem.convert('L')  # escala de cinza
-            pagina = ImageOps.autocontrast(pagina)
-            pagina = pagina.point(lambda x: 0 if x < 128 else 255, '1')  # binarizar
-
-            if pagina.mode not in ("RGB", "L"):
-                pagina = pagina.convert("RGB")
-
-            pagina = ImageEnhance.Sharpness(pagina).enhance(2.0)
-            texto_extraido += pytesseract.image_to_string(pagina)
+        pagina_imagem = paginas_imagem[-1]
+        texto_extraido = pytesseract.image_to_string(pagina_imagem)
 
         padrao_data = r'\b\d{2}/\d{2}/\d{2}\b'
         datas = re.findall(padrao_data, texto_extraido)
@@ -339,42 +336,23 @@ class AutomaçãoSertras():
         return None, None
 
     def ler_Nrs(self,caminho_arquivo, poppler_path, documento):
-        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path, dpi=300)
-
+        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path, dpi=300, first_page=1, last_page=1)
         texto_extraido = ""
+
         pagina = paginas_imagem[0]
+        texto_orientacao = pytesseract.image_to_osd(pagina)
+        rotacao = int(re.search(r'Rotate: (\d+)', texto_orientacao).group(1))
 
-        try:
-            texto_orientacao = pytesseract.image_to_osd(pagina)
-            rotacao = int(re.search(r'Rotate: (\d+)', texto_orientacao).group(1))
-            if rotacao != 0:
-                pagina = pagina.rotate(-rotacao, expand=True)
-        except pytesseract.TesseractError as e:
-            print(f"Erro ao detectar orientação: {e}", caminho_arquivo)
-       
-        if pagina.mode != 'L':
-            pagina = pagina.convert('L')
-
-        pagina = ImageOps.autocontrast(pagina)
-        pagina = pagina.point(lambda x: 0 if x < 128 else 255, '1')
-
-        if pagina.mode != "RGB":
-            pagina = pagina.convert("RGB")
-
-        pagina = ImageEnhance.Sharpness(pagina).enhance(2.0)
-
-        try:
-            texto_extraido += pytesseract.image_to_string(pagina)
-
-        except pytesseract.TesseractError as e:
-            print(f"Erro ao extrair texto: {e}", caminho_arquivo)
-            return None, None
+        if rotacao != 0:
+            pagina = pagina.rotate(-rotacao, expand=True)
+        
+        texto_extraido = pytesseract.image_to_string(pagina)
 
         padrao_data = r'(\d{1,2}\/\d{1,2}\/\d{4})|(\d{1,2}\sde\s[a-zà-ú]+\sde\s\d{4})'
         datas_encontradas = re.findall(padrao_data, texto_extraido, re.IGNORECASE)
 
         meses = {
-            'janeiro': '01', 'fevereiro': '02', 'março': '03', 'abril': '04',
+            'janeiro': '01', 'fevereiro': '02', 'março': '03', 'marco': '03','abril': '04',
             'maio': '05', 'junho': '06', 'julho': '07', 'agosto': '08',
             'setembro': '09', 'outubro': '10', 'novembro': '11', 'dezembro': '12'
         }
@@ -385,7 +363,6 @@ class AutomaçãoSertras():
                 data = data.strip().lower()
                 data = re.sub(r'\s+', ' ', data)
 
-                # Se a data estiver no formato "DD de mês de YYYY"
                 if 'de' in data:
                     partes = data.split(' de ')
                     if len(partes) == 3:
@@ -430,7 +407,8 @@ class AutomaçãoSertras():
         
     def get_dados(self):
         data_atual = datetime.now().strftime("%d-%m-%Y")
-        caminho_excel = f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx"
+        # caminho_excel = f"RELATÓRIO_SERTRAS {self.contrato_selecionado} {data_atual}.xlsx"
+        caminho_excel = f"RELATÓRIO_SERTRAS 17-04-2025.xlsx"
 
         if not os.path.exists(caminho_excel):
             self.BaixarRelatório() 
@@ -490,17 +468,21 @@ class AutomaçãoSertras():
         self.driver.switch_to.window(abas[-1])
 
     def enviar_documento(self, documentos_validos, mapeamento_para_documentos, mapeamento_para_datas, mapeamento_para_comentarios,vencimentos_enviados, documentos_enviados):
-        for arquivo, documento, caminho_arquivo, data_vencimento, função in documentos_validos:
+        for status, arquivo, documento, caminho_arquivo, data_vencimento, função in documentos_validos:
             if documento in mapeamento_para_datas:
                 xpath_data = mapeamento_para_datas[documento]
                 campo_data = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_data)))
                 self.driver.execute_script("arguments[0].scrollIntoView();", campo_data)
+
+                if status == "Pendente Correção":
+                    data_vencimento = campo_data.get_attribute("value")
+                    data_vencimento = datetime.strptime(data_vencimento, "%d/%m/%Y")
+                    data_vencimento += timedelta(days=1)
+                    data_vencimento = data_vencimento.strftime('%d/%m/%Y')
+
                 campo_data.clear()
                 campo_data.send_keys(data_vencimento)
                 vencimentos_enviados.append(data_vencimento)
-
-            if data_vencimento is None:
-                vencimentos_enviados.append("N/A")
 
             if documento in mapeamento_para_documentos:
                 xpath_documento = mapeamento_para_documentos[documento]
@@ -514,6 +496,9 @@ class AutomaçãoSertras():
                 campo_comentario = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_comentario)))
                 self.driver.execute_script("arguments[0].scrollIntoView();", campo_comentario)
                 campo_comentario.clear()
+
+            if data_vencimento is None:
+                vencimentos_enviados.append("N/A")
 
             time.sleep(1)
 
@@ -597,36 +582,42 @@ class AutomaçãoSertras():
                     datas_modificacao.append("N/A")
 
                 if documento in ["ASO","EPI", "NR10", "NR11", "NR12", "NR33", "NR35"]:
-                    data_extraida, data_vencimento = self.extrair_vencimento(caminho_arquivo, poppler_path, documento)
+                    if status in ["Pendente", "Vencido"]:
+                        data_extraida, data_vencimento = self.extrair_vencimento(caminho_arquivo, poppler_path, documento)
 
-                    if isinstance(data_vencimento, (list, tuple)):
-                        data_vencimento = data_vencimento[0] if data_vencimento else None
+                        if isinstance(data_vencimento, (list, tuple)):
+                            data_vencimento = data_vencimento[0] if data_vencimento else None
 
-                    if not data_vencimento:
-                        erro_envio.append(arquivo)
-                        continue
+                        if not data_vencimento:
+                            erro_envio.append(arquivo)
+                            continue
 
-                    try:
-                        data_vencimento = datetime.strptime(data_vencimento, "%d/%m/%Y")
+                        try:
+                            data_vencimento = datetime.strptime(data_vencimento, "%d/%m/%Y")
 
-                        if status == "Pendente Correção":
-                            data_vencimento += timedelta(days=1)
-                        
-                        data_vencimento = data_vencimento.strftime('%d/%m/%Y')
+                            if status == "Pendente Correção":
+                                data_vencimento += timedelta(days=1)
+                            
+                            data_vencimento = data_vencimento.strftime('%d/%m/%Y')
 
-                    except (ValueError, TypeError):
-                        erro_envio.append(arquivo)
-                        continue
+                        except (ValueError, TypeError):
+                            erro_envio.append(arquivo)
+                            continue
 
-                    datas_extraidas.append(data_extraida)
-                    vencimentos_projetados.append(data_vencimento)
+                        datas_extraidas.append(data_extraida)
+                        vencimentos_projetados.append(data_vencimento)
+
+                    else:
+                        data_vencimento = None
+                        datas_extraidas.append("N/A")
+                        vencimentos_projetados.append("N/A")
 
                 else:
                     data_vencimento = None
                     datas_extraidas.append("N/A")
                     vencimentos_projetados.append("N/A")
 
-                documentos_validos.append((arquivo, documento, caminho_arquivo, data_vencimento, funcao))
+                documentos_validos.append((status, arquivo, documento, caminho_arquivo, data_vencimento, funcao))
 
             if documentos_validos:
                 self.interacao_interface_envio(nome)
