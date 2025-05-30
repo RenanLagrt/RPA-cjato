@@ -6,6 +6,7 @@ import shutil
 import zipfile
 import pytesseract
 import pandas as pd
+from PyPDF2 import PdfReader
 from dateutil.relativedelta import relativedelta
 from docx import Document
 from datetime import datetime
@@ -52,11 +53,12 @@ class AutomaçãoDocumentos():
             return diretorio_efetivo, diretorio_funcionarios, documentos_por_função, diretorio_modelos, diretorio_saidas
     
     def ler_aso(self,caminho_arquivo, poppler_path):
-        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path)
+        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path, first_page=1, last_page=1)
         texto_extraido = ""
 
-        for pagina_imagem in paginas_imagem:
-            texto_extraido += pytesseract.image_to_string(pagina_imagem)
+        pagina_imagem = paginas_imagem[0]
+
+        texto_extraido = pytesseract.image_to_string(pagina_imagem)
 
         padrao_data = r'\b\d{2}/\d{2}/\d{4}\b'
         datas = re.findall(padrao_data, texto_extraido)
@@ -67,11 +69,14 @@ class AutomaçãoDocumentos():
         return None  
 
     def ler_epi(self,caminho_arquivo, poppler_path):
-        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path)
+        reader = PdfReader(caminho_arquivo)
+        last_page = len(reader.pages)
+
+        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path, first_page=last_page, last_page=last_page)
         texto_extraido = ""
 
-        for pagina_imagem in paginas_imagem:
-            texto_extraido += pytesseract.image_to_string(pagina_imagem)
+        pagina_imagem = paginas_imagem[-1]
+        texto_extraido = pytesseract.image_to_string(pagina_imagem)
 
         padrao_data = r'\b\d{2}/\d{2}/\d{2}\b'
         datas = re.findall(padrao_data, texto_extraido)
@@ -86,16 +91,17 @@ class AutomaçãoDocumentos():
         return None
 
     def ler_Nrs(self,caminho_arquivo, poppler_path):
-        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path, dpi=300)
+        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path, dpi=300, first_page=1, last_page=1)
         texto_extraido = ""
 
-        for pagina in paginas_imagem:
-            texto_orientacao = pytesseract.image_to_osd(pagina)
-            rotacao = int(re.search(r'Rotate: (\d+)', texto_orientacao).group(1))
-            if rotacao != 0:
-                pagina = pagina.rotate(-rotacao, expand=True)
-            
-            texto_extraido += pytesseract.image_to_string(pagina)
+        pagina = paginas_imagem[0]
+        texto_orientacao = pytesseract.image_to_osd(pagina)
+        rotacao = int(re.search(r'Rotate: (\d+)', texto_orientacao).group(1))
+
+        if rotacao != 0:
+            pagina = pagina.rotate(-rotacao, expand=True)
+        
+        texto_extraido = pytesseract.image_to_string(pagina)
 
         padrao_data = r'(\d{1,2}\/\d{1,2}\/\d{4})|(\d{1,2}\sde\s[a-zà-ú]+\sde\s\d{4})'
         datas_encontradas = re.findall(padrao_data, texto_extraido, re.IGNORECASE)
@@ -126,11 +132,14 @@ class AutomaçãoDocumentos():
         return None
     
     def ler_OS(self,caminho_arquivo, poppler_path):
-        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path)
+        reader = PdfReader(caminho_arquivo)
+        last_page = len(reader.pages)
+
+        paginas_imagem = convert_from_path(caminho_arquivo, poppler_path=poppler_path, first_page=last_page, last_page=last_page)
+        pagina_imagem = paginas_imagem[0]
         texto_extraido = ""
 
-        for pagina_imagem in paginas_imagem:
-            texto_extraido += pytesseract.image_to_string(pagina_imagem)
+        texto_extraido = pytesseract.image_to_string(pagina_imagem)
 
         padrao_data = r'\b\d{2}/\d{2}/\d{2,4}\b'
         datas = re.findall(padrao_data, texto_extraido)

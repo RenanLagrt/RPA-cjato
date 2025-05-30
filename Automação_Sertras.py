@@ -292,7 +292,7 @@ class AutomaçãoSertras():
 
         subprocess.run(["cmd", "/c", "start", "", caminho_saida], shell=True)
 
-# -----------------------------|------------------------------|---------------------------|-----
+# -----------------------------|------------------------------|---------------------------|--------------------------------
 
     @staticmethod
     def calcular_vencimento(data_str, anos=1):
@@ -519,7 +519,7 @@ class AutomaçãoSertras():
 
         botao_envio = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="btnFuncaoRequisitoValores"]')))
         self.driver.execute_script("arguments[0].scrollIntoView();", botao_envio)
-        botao_envio.click()
+        # botao_envio.click()
 
         time.sleep(2.5)
 
