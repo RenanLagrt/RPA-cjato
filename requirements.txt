@@ -1,0 +1,24 @@
+# Automação e sistema
+psutil
+
+# Web automation
+selenium
+webdriver-manager
+
+# OCR
+pytesseract
+pdf2image
+Pillow
+
+# PDF
+PyPDF2
+
+# Excel
+openpyxl
+pandas
+
+# Interface
+streamlit
+
+# Utilidades
+python-dotenv
